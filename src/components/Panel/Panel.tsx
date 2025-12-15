@@ -1,6 +1,8 @@
 import React, { memo } from "react";
 import styled from "styled-components";
+import Typography from "../Typography";
 import { PanelProps, PanelVariant, variantColors } from "./types";
+import { spacing } from "../../theme";
 
 const Container = styled.div<{ $variant: PanelVariant }>`
   display: flex;
@@ -13,10 +15,7 @@ const Container = styled.div<{ $variant: PanelVariant }>`
 
 const Header = styled.div<{ $variant: PanelVariant }>`
   background-color: ${(props) => variantColors[props.$variant].header};
-  color: #000;
-  padding: 8px 12px;
-  font-weight: bold;
-  font-size: 14px;
+  padding: ${spacing.sm} ${spacing.md};
   border-bottom: 1px solid ${(props) => variantColors[props.$variant].border};
   flex-shrink: 0;
 `;
@@ -31,7 +30,11 @@ const Panel: React.FC<PanelProps> = memo(
   ({ title, variant = "danger", children, className }) => {
     return (
       <Container $variant={variant} className={className}>
-        <Header $variant={variant}>{title}</Header>
+        <Header $variant={variant}>
+          <Typography variant="body2" bold>
+            {title}
+          </Typography>
+        </Header>
         <Content>{children}</Content>
       </Container>
     );

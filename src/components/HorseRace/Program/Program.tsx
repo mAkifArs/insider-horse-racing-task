@@ -2,8 +2,10 @@ import React, { memo, useMemo } from "react";
 import styled from "styled-components";
 import Panel from "../../Panel";
 import DataTable, { Column } from "../../DataTable";
+import Typography from "../../Typography";
 import { Horse, Race, RaceStatus } from "../../../types";
 import { ProgramProps } from "./types";
+import { spacing } from "../../../theme";
 
 /**
  * Data structure for displaying a horse in the program
@@ -29,24 +31,19 @@ const StyledPanel = styled(Panel)`
 `;
 
 const RoundSection = styled.div`
-  margin-bottom: 8px;
+  margin-bottom: ${spacing.sm};
 `;
 
 const RoundHeader = styled.div<{ $isActive: boolean; $isCompleted: boolean }>`
   background-color: ${(props) =>
     props.$isActive ? "#ffd700" : props.$isCompleted ? "#90EE90" : "#cd5c5c"};
-  color: #000;
-  padding: 4px 8px;
-  font-weight: bold;
-  font-size: 11px;
+  padding: ${spacing.xs} ${spacing.sm};
   text-align: center;
 `;
 
 const EmptyMessage = styled.div`
-  padding: 20px;
+  padding: ${spacing.xl};
   text-align: center;
-  color: #666;
-  font-size: 12px;
 `;
 
 /**
@@ -117,7 +114,9 @@ const Program: React.FC<ProgramProps> = memo(
       return (
         <StyledPanel title="Program" variant="primary">
           <EmptyMessage>
-            Click "GENERATE PROGRAM" to create race schedule
+            <Typography variant="caption" color="secondary">
+              Click "GENERATE PROGRAM" to create race schedule
+            </Typography>
           </EmptyMessage>
         </StyledPanel>
       );
@@ -137,7 +136,10 @@ const Program: React.FC<ProgramProps> = memo(
           return (
             <RoundSection key={race.roundNumber}>
               <RoundHeader $isActive={isActive} $isCompleted={isCompleted}>
-                {formatLapLabel(race.roundNumber, race.distance)} {statusLabel}
+                <Typography variant="caption" bold>
+                  {formatLapLabel(race.roundNumber, race.distance)}{" "}
+                  {statusLabel}
+                </Typography>
               </RoundHeader>
               <DataTable
                 columns={columns}

@@ -1,9 +1,11 @@
 import React, { memo, useCallback } from "react";
 import styled from "styled-components";
+import Typography from "../../Typography";
 import { RaceTrackProps } from "./types";
 import { useGameStore, selectRaceExecution } from "../../../store";
 import { HorsePosition, RaceResultEntry, GameState } from "../../../types";
 import { useAnimationFrame } from "../../../hooks/useAnimationFrame";
+import { fontSize, fontWeight, colors, spacing } from "../../../theme";
 import HorseSvg from "./HorseSvg";
 
 const TrackContainer = styled.div`
@@ -42,20 +44,20 @@ const Lane = styled.div<{ $isEven: boolean }>`
 const LaneNumber = styled.div`
   width: 30px;
   height: 30px;
-  background-color: #ffd700;
+  background-color: ${colors.track.laneNumber};
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 12px;
-  margin-right: 10px;
+  font-weight: ${fontWeight.bold};
+  font-size: ${fontSize.sm};
+  margin-right: ${spacing.sm};
   flex-shrink: 0;
 
   @media (max-width: 768px) {
     width: 24px;
     height: 24px;
-    font-size: 10px;
+    font-size: ${fontSize.xs};
     margin-right: 6px;
   }
 `;
@@ -95,23 +97,20 @@ const FinishLine = styled.div`
 `;
 
 const FinishText = styled.span`
-  background-color: #228b22;
-  color: white;
+  background-color: ${colors.track.finishLine};
+  color: ${colors.neutral.white};
   padding: 2px 6px;
-  font-size: 10px;
-  font-weight: bold;
+  font-size: ${fontSize.xs};
+  font-weight: ${fontWeight.bold};
   border-radius: 2px;
 `;
 
 const RaceInfo = styled.div`
   text-align: center;
-  padding: 8px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
+  padding: ${spacing.sm};
   background-color: rgba(255, 255, 255, 0.7);
   border-radius: 4px;
-  margin-top: 10px;
+  margin-top: ${spacing.sm};
 `;
 
 const EmptyMessage = styled.div`
@@ -119,8 +118,6 @@ const EmptyMessage = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
-  font-size: 16px;
-  color: #333;
   text-align: center;
 `;
 
@@ -229,11 +226,13 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
       return (
         <TrackContainer>
           <EmptyMessage>
-            {gameState === GameState.SCHEDULE_READY
-              ? 'Click "START" to begin racing'
-              : gameState === GameState.COMPLETED
-              ? "All races completed!"
-              : "Generate a program to start racing"}
+            <Typography variant="body1" color="secondary">
+              {gameState === GameState.SCHEDULE_READY
+                ? 'Click "START" to begin racing'
+                : gameState === GameState.COMPLETED
+                ? "All races completed!"
+                : "Generate a program to start racing"}
+            </Typography>
           </EmptyMessage>
         </TrackContainer>
       );
@@ -270,7 +269,11 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
             <FinishText>FINISH</FinishText>
           </FinishLine>
         </LanesContainer>
-        <RaceInfo>{formatLapLabel(currentRace.roundNumber, distance)}</RaceInfo>
+        <RaceInfo>
+          <Typography variant="body2" bold>
+            {formatLapLabel(currentRace.roundNumber, distance)}
+          </Typography>
+        </RaceInfo>
       </TrackContainer>
     );
   }

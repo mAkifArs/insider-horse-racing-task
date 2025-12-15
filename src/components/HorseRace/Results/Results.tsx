@@ -2,8 +2,10 @@ import React, { memo, useMemo } from "react";
 import styled from "styled-components";
 import Panel from "../../Panel";
 import DataTable, { Column } from "../../DataTable";
+import Typography from "../../Typography";
 import { RaceResult, RaceResultEntry } from "../../../types";
 import { ResultsProps } from "./types";
+import { spacing } from "../../../theme";
 
 /**
  * Data structure for displaying a result entry in the table
@@ -29,15 +31,12 @@ const StyledPanel = styled(Panel)`
 `;
 
 const RoundSection = styled.div`
-  margin-bottom: 8px;
+  margin-bottom: ${spacing.sm};
 `;
 
 const RoundHeader = styled.div`
   background-color: #90ee90; /* Green for completed races */
-  color: #000;
-  padding: 4px 8px;
-  font-weight: bold;
-  font-size: 11px;
+  padding: ${spacing.xs} ${spacing.sm};
   text-align: center;
 `;
 
@@ -46,10 +45,8 @@ const ScrollContainer = styled.div`
 `;
 
 const EmptyMessage = styled.div`
-  padding: 20px;
+  padding: ${spacing.xl};
   text-align: center;
-  color: #666;
-  font-size: 12px;
 `;
 
 /**
@@ -100,7 +97,9 @@ const RaceResultSection: React.FC<{
   return (
     <RoundSection>
       <RoundHeader>
-        {formatRoundLabel(result.roundNumber, result.distance)}
+        <Typography variant="caption" bold>
+          {formatRoundLabel(result.roundNumber, result.distance)}
+        </Typography>
       </RoundHeader>
       <DataTable
         columns={resultColumns}
@@ -121,7 +120,11 @@ const Results: React.FC<ResultsProps> = memo(({ results }) => {
   if (results.length === 0) {
     return (
       <StyledPanel title="Results" variant="primary">
-        <EmptyMessage>No races completed yet</EmptyMessage>
+        <EmptyMessage>
+          <Typography variant="caption" color="secondary">
+            No races completed yet
+          </Typography>
+        </EmptyMessage>
       </StyledPanel>
     );
   }

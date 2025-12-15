@@ -1,15 +1,16 @@
 import { memo } from "react";
 import styled from "styled-components";
 import { DataTableProps } from "./types";
+import { fontSize, fontWeight, colors, spacing } from "../../theme";
 
 const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
-  font-size: 12px;
+  font-size: ${fontSize.sm};
 `;
 
 const TableHeader = styled.thead`
-  background-color: #f5f5f5;
+  background-color: ${colors.neutral.gray100};
   position: sticky;
   top: 0;
   z-index: 1;
@@ -17,34 +18,34 @@ const TableHeader = styled.thead`
 
 const TableRow = styled.tr`
   &:nth-child(even) {
-    background-color: #f9f9f9;
+    background-color: ${colors.neutral.gray50};
   }
 
   &:hover {
-    background-color: #e8e8e8;
+    background-color: ${colors.neutral.gray200};
   }
 `;
 
 const TableHeaderCell = styled.th<{ $align?: string; $width?: string }>`
-  padding: 8px 10px;
+  padding: ${spacing.sm};
   text-align: ${(props) => props.$align || "left"};
-  border-bottom: 1px solid #ddd;
-  font-weight: bold;
-  font-size: 11px;
-  color: #333;
+  border-bottom: 1px solid ${colors.neutral.gray300};
+  font-weight: ${fontWeight.bold};
+  font-size: ${fontSize.xs};
+  color: ${colors.text.primary};
   width: ${(props) => props.$width || "auto"};
 `;
 
 const TableCell = styled.td<{ $align?: string }>`
-  padding: 6px 10px;
-  border-bottom: 1px solid #eee;
+  padding: 6px ${spacing.sm};
+  border-bottom: 1px solid ${colors.neutral.gray200};
   vertical-align: middle;
   text-align: ${(props) => props.$align || "left"};
 `;
 
 const RowNumberCell = styled(TableCell)`
   text-align: center;
-  color: #666;
+  color: ${colors.text.secondary};
   width: 40px;
 `;
 

@@ -8,11 +8,13 @@ import { HorseListProps } from "./types";
 const StyledPanel = styled(Panel)`
   min-width: 280px;
   max-width: 320px;
+  height: 100%;
 
   @media (max-width: 1024px) {
     min-width: unset;
     max-width: unset;
     width: 100%;
+    height: auto;
     max-height: 300px;
   }
 

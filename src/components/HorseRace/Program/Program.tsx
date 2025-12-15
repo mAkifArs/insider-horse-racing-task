@@ -17,11 +17,14 @@ interface ProgramHorseEntry {
 const StyledPanel = styled(Panel)`
   min-width: 240px;
   max-width: 240px;
+  height: 100%;
 
   @media (max-width: 1024px) {
     min-width: unset;
     max-width: unset;
     width: 100%;
+    height: auto;
+    max-height: 400px;
   }
 `;
 

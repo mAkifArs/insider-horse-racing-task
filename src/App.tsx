@@ -26,11 +26,18 @@ import { GameState } from "./types";
 // ─────────────────────────────────────────────────────────────────────────────
 
 const AppContainer = styled.div`
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   background-color: ${colors.background.app};
   font-family: Arial, sans-serif;
+  overflow: hidden; /* Prevent page scrolling on desktop */
+
+  @media (max-width: ${breakpoints.tablet}) {
+    height: auto;
+    min-height: 100vh;
+    overflow: auto; /* Allow page scrolling on mobile/tablet */
+  }
 `;
 
 const MainContent = styled.main`
@@ -38,11 +45,12 @@ const MainContent = styled.main`
   gap: ${spacing.lg};
   padding: ${spacing.lg};
   flex: 1;
-  height: calc(100vh - 60px);
+  min-height: 0; /* Important for flex children to respect height constraints */
+  overflow: hidden;
 
   @media (max-width: ${breakpoints.tablet}) {
     flex-direction: column;
-    height: auto;
+    overflow: visible;
     padding: ${spacing.md};
   }
 

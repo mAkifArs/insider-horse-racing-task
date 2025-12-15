@@ -1,0 +1,139 @@
+import React, { memo, useMemo } from "react";
+import styled from "styled-components";
+import Panel from "../../Panel";
+import DataTable, { Column } from "../../DataTable";
+import { RaceResult, RaceResultEntry } from "../../../types";
+import { ResultsProps } from "./types";
+
+/**
+ * Data structure for displaying a result entry in the table
+ */
+interface ResultTableEntry {
+  position: number;
+  name: string;
+  horseId: string;
+}
+
+const StyledPanel = styled(Panel)`
+  min-width: 240px;
+  max-width: 240px;
+
+  @media (max-width: 1024px) {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+  }
+`;
+
+const RoundSection = styled.div`
+  margin-bottom: 8px;
+`;
+
+const RoundHeader = styled.div`
+  background-color: #90ee90; /* Green for completed races */
+  color: #000;
+  padding: 4px 8px;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: center;
+`;
+
+const ScrollContainer = styled.div`
+  overflow-y: auto;
+`;
+
+const EmptyMessage = styled.div`
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 12px;
+`;
+
+/**
+ * Format round label for display
+ */
+const formatRoundLabel = (roundNumber: number, distance: number): string => {
+  const suffix =
+    roundNumber === 1
+      ? "ST"
+      : roundNumber === 2
+      ? "ND"
+      : roundNumber === 3
+      ? "RD"
+      : "TH";
+  return `${roundNumber}${suffix} Lap - ${distance}m`;
+};
+
+/**
+ * Table columns for results
+ */
+const resultColumns: Column<ResultTableEntry>[] = [
+  {
+    key: "position",
+    header: "Position",
+    align: "center" as const,
+    width: "60px",
+  },
+  {
+    key: "name",
+    header: "Name",
+  },
+];
+
+/**
+ * Component to display a single race result
+ */
+const RaceResultSection: React.FC<{
+  result: RaceResult;
+}> = memo(({ result }) => {
+  const tableData: ResultTableEntry[] = useMemo(() => {
+    return result.results.map((entry: RaceResultEntry) => ({
+      position: entry.position,
+      name: entry.horse.name,
+      horseId: entry.horseId,
+    }));
+  }, [result.results]);
+
+  return (
+    <RoundSection>
+      <RoundHeader>
+        {formatRoundLabel(result.roundNumber, result.distance)}
+      </RoundHeader>
+      <DataTable
+        columns={resultColumns}
+        data={tableData}
+        keyExtractor={(entry) => entry.horseId}
+      />
+    </RoundSection>
+  );
+});
+
+RaceResultSection.displayName = "RaceResultSection";
+
+/**
+ * Results component
+ * Displays race outcomes as they complete
+ */
+const Results: React.FC<ResultsProps> = memo(({ results }) => {
+  if (results.length === 0) {
+    return (
+      <StyledPanel title="Results" variant="primary">
+        <EmptyMessage>No races completed yet</EmptyMessage>
+      </StyledPanel>
+    );
+  }
+
+  return (
+    <StyledPanel title="Results" variant="primary">
+      <ScrollContainer>
+        {results.map((result) => (
+          <RaceResultSection key={result.roundNumber} result={result} />
+        ))}
+      </ScrollContainer>
+    </StyledPanel>
+  );
+});
+
+Results.displayName = "Results";
+
+export default Results;

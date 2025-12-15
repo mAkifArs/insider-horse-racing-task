@@ -2,7 +2,10 @@ import { useEffect, useCallback } from "react";
 import styled from "styled-components";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { HorseList, Program, RaceTrack, Results } from "./components/HorseRace";
+import AppBar from "./components/AppBar";
+import Button from "./components/Button";
 import { useIsMobile } from "./hooks/useIsMobile";
+import { colors, spacing, breakpoints } from "./theme";
 import {
   useGameStore,
   selectHorses,
@@ -18,92 +21,34 @@ import {
 } from "./store";
 import { GameState } from "./types";
 
-// Breakpoints
-const MOBILE_BREAKPOINT = "768px";
-const TABLET_BREAKPOINT = "1024px";
+// ─────────────────────────────────────────────────────────────────────────────
+// STYLED COMPONENTS
+// ─────────────────────────────────────────────────────────────────────────────
 
 const AppContainer = styled.div`
   min-height: 100vh;
-  padding: 20px;
-  background-color: #c0c0c0;
+  display: flex;
+  flex-direction: column;
+  background-color: ${colors.background.app};
   font-family: Arial, sans-serif;
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    padding: 12px;
-  }
-`;
-
-const Header = styled.header`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-  gap: 12px;
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-`;
-
-const Title = styled.h1`
-  margin: 0;
-  font-size: 18px;
-  color: #333;
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    text-align: center;
-    font-size: 20px;
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    justify-content: center;
-    gap: 8px;
-  }
-`;
-
-const Button = styled.button<{ $disabled?: boolean }>`
-  padding: 8px 16px;
-  font-size: 12px;
-  font-weight: bold;
-  cursor: ${(props) => (props.$disabled ? "not-allowed" : "pointer")};
-  border: 1px solid #666;
-  background-color: ${(props) => (props.$disabled ? "#ccc" : "#e0e0e0")};
-  opacity: ${(props) => (props.$disabled ? 0.6 : 1)};
-  white-space: nowrap;
-
-  &:hover {
-    background-color: ${(props) => (props.$disabled ? "#ccc" : "#d0d0d0")};
-  }
-
-  &:active {
-    background-color: ${(props) => (props.$disabled ? "#ccc" : "#c0c0c0")};
-  }
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    padding: 12px 16px;
-    font-size: 14px;
-    flex: 1;
-    min-width: 100px;
-  }
 `;
 
 const MainContent = styled.main`
   display: flex;
-  gap: 16px;
-  height: calc(100vh - 100px);
+  gap: ${spacing.lg};
+  padding: ${spacing.lg};
+  flex: 1;
+  height: calc(100vh - 60px);
 
-  @media (max-width: ${TABLET_BREAKPOINT}) {
+  @media (max-width: ${breakpoints.tablet}) {
     flex-direction: column;
     height: auto;
-    min-height: calc(100vh - 140px);
+    padding: ${spacing.md};
+  }
+
+  @media (max-width: ${breakpoints.mobile}) {
+    gap: ${spacing.md};
+    padding: ${spacing.sm};
   }
 `;
 
@@ -111,24 +56,8 @@ const LeftPanel = styled.div`
   flex-shrink: 0;
   height: 100%;
 
-  @media (max-width: ${TABLET_BREAKPOINT}) {
+  @media (max-width: ${breakpoints.tablet}) {
     height: auto;
-  }
-`;
-
-const RightPanel = styled.div`
-  display: flex;
-  gap: 16px;
-  flex-shrink: 0;
-  height: 100%;
-
-  @media (max-width: ${TABLET_BREAKPOINT}) {
-    height: auto;
-    flex-direction: column;
-  }
-
-  @media (max-width: ${MOBILE_BREAKPOINT}) {
-    gap: 12px;
   }
 `;
 
@@ -137,11 +66,41 @@ const CenterPanel = styled.div`
   height: 100%;
   min-width: 0;
 
-  @media (max-width: ${TABLET_BREAKPOINT}) {
+  @media (max-width: ${breakpoints.tablet}) {
     height: auto;
-    min-height: 200px;
+    min-height: 300px;
   }
 `;
+
+const RightPanel = styled.div`
+  display: flex;
+  gap: ${spacing.lg};
+  flex-shrink: 0;
+  height: 100%;
+
+  @media (max-width: ${breakpoints.tablet}) {
+    height: auto;
+    flex-direction: column;
+  }
+
+  @media (max-width: ${breakpoints.mobile}) {
+    gap: ${spacing.md};
+  }
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: ${spacing.sm};
+
+  @media (max-width: ${breakpoints.mobile}) {
+    width: 100%;
+    justify-content: center;
+  }
+`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPONENT
+// ─────────────────────────────────────────────────────────────────────────────
 
 function App() {
   // Detect mobile viewport
@@ -194,14 +153,7 @@ function App() {
     } else if (isPaused) {
       resumeRacing();
     }
-  }, [
-    canStartRace,
-    isRacing,
-    isPaused,
-    startRacing,
-    pauseRacing,
-    resumeRacing,
-  ]);
+  }, [canStartRace, isRacing, isPaused, startRacing, pauseRacing, resumeRacing]);
 
   // Handle Reset Game button
   const handleResetGame = useCallback(() => {
@@ -220,26 +172,35 @@ function App() {
     gameState === GameState.HORSES_READY ||
     gameState === GameState.COMPLETED;
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // RENDER
+  // ─────────────────────────────────────────────────────────────────────────
+
   return (
     <ErrorBoundary>
       <AppContainer>
-        <Header>
-          <Title>Horse Racing</Title>
-          <ButtonGroup>
-            <Button
-              onClick={handleGenerateProgram}
-              $disabled={!canGenerateSchedule}
-            >
-              {isMobile ? "PROGRAM" : "GENERATE PROGRAM"}
-            </Button>
-            <Button onClick={handleStartPause} $disabled={isStartPauseDisabled}>
-              {getStartPauseLabel()}
-            </Button>
-            <Button onClick={handleResetGame} $disabled={isRacing}>
-              {isMobile ? "RESET" : "RESET GAME"}
-            </Button>
-          </ButtonGroup>
-        </Header>
+        <AppBar
+          title="Horse Racing"
+          actions={
+            <ButtonGroup>
+              <Button
+                onClick={handleGenerateProgram}
+                disabled={!canGenerateSchedule}
+              >
+                {isMobile ? "PROGRAM" : "GENERATE PROGRAM"}
+              </Button>
+              <Button
+                onClick={handleStartPause}
+                disabled={isStartPauseDisabled}
+              >
+                {getStartPauseLabel()}
+              </Button>
+              <Button onClick={handleResetGame} disabled={isRacing}>
+                {isMobile ? "RESET" : "RESET GAME"}
+              </Button>
+            </ButtonGroup>
+          }
+        />
         <MainContent>
           <LeftPanel>
             <HorseList horses={horses} />

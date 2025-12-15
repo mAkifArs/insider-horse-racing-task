@@ -68,12 +68,20 @@ const TrackArea = styled.div`
   height: 100%;
 `;
 
-const HorseIconWrapper = styled.div<{ $position: number }>`
+/**
+ * Horse wrapper using .attrs() for performance
+ * - Dynamic position is passed via inline style (no class regeneration)
+ * - will-change hints browser about upcoming changes
+ */
+const HorseIconWrapper = styled.div.attrs<{ $position: number }>((props) => ({
+  style: {
+    left: `${props.$position}%`,
+  },
+}))<{ $position: number }>`
   position: absolute;
-  left: ${(props) => props.$position}%;
   top: 50%;
   transform: translateY(-50%);
-  transition: left 0.1s linear;
+  will-change: left;
   filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.4));
 `;
 

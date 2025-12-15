@@ -226,7 +226,6 @@ function App() {
             <RaceTrack
               currentRace={currentRace}
               horses={horses}
-              horsePositions={raceExecution.horsePositions}
               isAnimating={raceExecution.isAnimating}
               distance={currentDistance}
             />

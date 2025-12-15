@@ -1,17 +1,17 @@
-import React, { memo, useCallback } from "react";
+import React, { memo } from "react";
 import styled from "styled-components";
 import Typography from "../../Typography";
 import { RaceTrackProps } from "./types";
-import {
-  useGameStore,
-  selectRaceExecution,
-  selectResults,
-} from "../../../store";
-import { HorsePosition, RaceResultEntry, GameState } from "../../../types";
-import { useAnimationFrame } from "../../../hooks/useAnimationFrame";
+import { useGameStore, selectResults } from "../../../store";
+import { GameState } from "../../../types";
+import { useRaceAnimation } from "../../../hooks/useRaceAnimation";
 import { fontSize, fontWeight, colors, spacing } from "../../../theme";
 import { formatRoundLabel } from "../../../utils/formatters";
 import HorseSvg from "./HorseSvg";
+
+// =============================================================================
+// STYLED COMPONENTS
+// =============================================================================
 
 const TrackContainer = styled.div`
   border-radius: 4px;
@@ -134,141 +134,89 @@ const EmptyMessage = styled.div`
   text-align: center;
 `;
 
-/**
- * Base distance for race duration calculation
- * Longer races take proportionally more time
- */
-const BASE_DISTANCE = 1200;
+// =============================================================================
+// HELPER FUNCTIONS
+// =============================================================================
 
+/**
+ * Get the message to display when no race is active
+ */
+const getEmptyMessage = (
+  gameState: GameState,
+  resultsCount: number
+): string => {
+  if (gameState === GameState.SCHEDULE_READY) {
+    return 'Click "START" to begin racing';
+  }
+  if (gameState === GameState.COMPLETED) {
+    return "All races completed! 🏆";
+  }
+  // Between races - show next race message
+  if (gameState === GameState.RACING && resultsCount > 0) {
+    const nextRound = resultsCount + 1;
+    return `Next race starting... (Round ${nextRound}/6)`;
+  }
+  return "Generate a program to start racing";
+};
+
+/**
+ * Convert position percentage to display position (accounting for finish line area)
+ */
+const getDisplayPosition = (positionPercent: number): number => {
+  return Math.min(positionPercent * 0.95, 95);
+};
+
+// =============================================================================
+// COMPONENT
+// =============================================================================
+
+/**
+ * RaceTrack Component
+ *
+ * Pure presentation component that renders the race track visualization.
+ * All animation logic is handled by the useRaceAnimation hook.
+ *
+ * Features:
+ * - 10 lanes with lane numbers
+ * - Animated horse icons
+ * - Finish line
+ * - Race info display
+ * - Empty state messages
+ */
 const RaceTrack: React.FC<RaceTrackProps> = memo(
-  ({ currentRace, horses, horsePositions, isAnimating, distance }) => {
-    const raceExecution = useGameStore(selectRaceExecution);
+  ({ currentRace, horses, isAnimating, distance }) => {
+    // Get game state for empty message logic
     const gameState = useGameStore((state) => state.gameState);
     const results = useGameStore(selectResults);
-    const updateHorsePositions = useGameStore(
-      (state) => state.updateHorsePositions
-    );
-    const completeCurrentRace = useGameStore(
-      (state) => state.completeCurrentRace
-    );
 
-    /**
-     * Animation callback - updates horse positions each frame
-     */
-    const animate = useCallback(
-      (deltaTime: number) => {
-        if (!isAnimating || !currentRace || gameState !== GameState.RACING) {
-          return;
-        }
+    // Use race animation hook - handles all position calculations
+    const { horsePositions } = useRaceAnimation({
+      currentRace,
+      horses,
+      isAnimating,
+    });
 
-        const now = Date.now();
+    // ─────────────────────────────────────────────────────────────────────────
+    // EMPTY STATE
+    // ─────────────────────────────────────────────────────────────────────────
 
-        // Calculate new positions
-        // Speed is calibrated so races take ~10-15 seconds
-        const newPositions: HorsePosition[] = raceExecution.horsePositions.map(
-          (hp) => {
-            // If already finished, don't move
-            if (hp.finishTime !== undefined) {
-              return hp;
-            }
-
-            // Random speed variation + base speed from horse condition
-            const speedVariation = 0.8 + Math.random() * 0.4;
-            // Factor in distance: longer races take proportionally more time
-            const distanceMultiplier = currentRace.distance / BASE_DISTANCE;
-            // Divide by 50 for base ~3-4 second races, scaled by distance
-            const moveAmount =
-              hp.speed *
-              speedVariation *
-              (deltaTime / (50 * distanceMultiplier));
-            const newPosition = Math.min(hp.position + moveAmount, 100);
-
-            // Track finish time when horse crosses finish line
-            const justFinished = hp.position < 100 && newPosition >= 100;
-
-            return {
-              ...hp,
-              position: newPosition,
-              finishTime: justFinished ? now : hp.finishTime,
-            };
-          }
-        );
-
-        updateHorsePositions(newPositions);
-
-        // Check if all horses have finished
-        const allFinished = newPositions.every(
-          (hp) => hp.finishTime !== undefined
-        );
-
-        if (allFinished) {
-          // Calculate results based on finish time (earlier = better)
-          const sortedPositions = [...newPositions].sort(
-            (a, b) => (a.finishTime || 0) - (b.finishTime || 0)
-          );
-
-          const results: RaceResultEntry[] = sortedPositions.map(
-            (hp, index) => {
-              const horse = horses.find((h) => h.id === hp.horseId);
-              return {
-                horseId: hp.horseId,
-                position: index + 1,
-                time:
-                  (hp.finishTime || now) -
-                  (raceExecution.animationStartTime || 0),
-                horse: horse!,
-              };
-            }
-          );
-
-          completeCurrentRace(results);
-        }
-      },
-      [
-        isAnimating,
-        currentRace,
-        gameState,
-        raceExecution.horsePositions,
-        raceExecution.animationStartTime,
-        horses,
-        updateHorsePositions,
-        completeCurrentRace,
-      ]
-    );
-
-    // Use animation frame hook
-    useAnimationFrame(animate, isAnimating && gameState === GameState.RACING);
-
-    // No race to display
     if (!currentRace) {
-      // Determine the appropriate message
-      const getMessage = () => {
-        if (gameState === GameState.SCHEDULE_READY) {
-          return 'Click "START" to begin racing';
-        }
-        if (gameState === GameState.COMPLETED) {
-          return "All races completed! 🏆";
-        }
-        // Between races - show next race message
-        if (gameState === GameState.RACING && results.length > 0) {
-          const nextRound = results.length + 1;
-          return `Next race starting... (Round ${nextRound}/6)`;
-        }
-        return "Generate a program to start racing";
-      };
-
       return (
         <TrackContainer>
           <EmptyMessage>
             <Typography variant="body1" color="secondary">
-              {getMessage()}
+              {getEmptyMessage(gameState, results.length)}
             </Typography>
           </EmptyMessage>
         </TrackContainer>
       );
     }
 
-    // Get horses for current race
+    // ─────────────────────────────────────────────────────────────────────────
+    // RACE VIEW
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // Get horses participating in this race
     const raceHorses = currentRace.horseIds
       .map((id) => horses.find((h) => h.id === id))
       .filter((h): h is NonNullable<typeof h> => h !== undefined);
@@ -280,9 +228,7 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
             const position = horsePositions.find(
               (hp) => hp.horseId === horse.id
             );
-            const positionPercent = position?.position ?? 0;
-            // Adjust position to account for finish line area (max 95%)
-            const displayPosition = Math.min(positionPercent * 0.95, 95);
+            const displayPosition = getDisplayPosition(position?.position ?? 0);
 
             return (
               <Lane key={horse.id} $isEven={index % 2 === 0}>

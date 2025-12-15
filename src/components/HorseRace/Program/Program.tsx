@@ -5,7 +5,8 @@ import DataTable, { Column } from "../../DataTable";
 import Typography from "../../Typography";
 import { Horse, Race, RaceStatus } from "../../../types";
 import { ProgramProps } from "./types";
-import { spacing } from "../../../theme";
+import { spacing, colors } from "../../../theme";
+import { formatRoundLabel } from "../../../utils/formatters";
 
 /**
  * Data structure for displaying a horse in the program
@@ -36,7 +37,11 @@ const RoundSection = styled.div`
 
 const RoundHeader = styled.div<{ $isActive: boolean; $isCompleted: boolean }>`
   background-color: ${(props) =>
-    props.$isActive ? "#ffd700" : props.$isCompleted ? "#90EE90" : "#cd5c5c"};
+    props.$isActive
+      ? colors.track.laneNumber
+      : props.$isCompleted
+      ? colors.success.light
+      : colors.danger.main};
   padding: ${spacing.xs} ${spacing.sm};
   text-align: center;
 `;
@@ -58,21 +63,6 @@ const getHorsesForRace = (race: Race, horses: Horse[]): ProgramHorseEntry[] => {
       horseId,
     };
   });
-};
-
-/**
- * Format lap label (e.g., "1ST Lap - 1200m")
- */
-const formatLapLabel = (roundNumber: number, distance: number): string => {
-  const suffix =
-    roundNumber === 1
-      ? "ST"
-      : roundNumber === 2
-      ? "ND"
-      : roundNumber === 3
-      ? "RD"
-      : "TH";
-  return `${roundNumber}${suffix} Lap - ${distance}m`;
 };
 
 /**
@@ -137,7 +127,7 @@ const Program: React.FC<ProgramProps> = memo(
             <RoundSection key={race.roundNumber}>
               <RoundHeader $isActive={isActive} $isCompleted={isCompleted}>
                 <Typography variant="caption" bold>
-                  {formatLapLabel(race.roundNumber, race.distance)}{" "}
+                  {formatRoundLabel(race.roundNumber, race.distance)}{" "}
                   {statusLabel}
                 </Typography>
               </RoundHeader>

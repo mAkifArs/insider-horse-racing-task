@@ -3,7 +3,9 @@ import styled from "styled-components";
 import { Horse } from "../../../types/horse";
 import Panel from "../../Panel";
 import DataTable, { Column } from "../../DataTable";
+import Typography from "../../Typography";
 import { HorseListProps } from "./types";
+import { spacing } from "../../../theme";
 
 const StyledPanel = styled(Panel)`
   min-width: 280px;
@@ -32,6 +34,11 @@ const ColorSwatch = styled.div<{ $color: string }>`
   margin: 0 auto;
 `;
 
+const LoadingMessage = styled.div`
+  padding: ${spacing.xl};
+  text-align: center;
+`;
+
 const HorseList: React.FC<HorseListProps> = memo(({ horses }) => {
   // Define columns with memoization to prevent unnecessary re-renders
   const columns: Column<Horse>[] = useMemo(
@@ -56,6 +63,19 @@ const HorseList: React.FC<HorseListProps> = memo(({ horses }) => {
     ],
     []
   );
+
+  // Show loading state when horses haven't been initialized
+  if (horses.length === 0) {
+    return (
+      <StyledPanel title="Horse List" variant="danger">
+        <LoadingMessage>
+          <Typography variant="body2" color="secondary">
+            Loading horses...
+          </Typography>
+        </LoadingMessage>
+      </StyledPanel>
+    );
+  }
 
   return (
     <StyledPanel title={`Horse List (1-${horses.length})`} variant="danger">

@@ -126,6 +126,9 @@ function App() {
   const isRacing = useGameStore(selectIsRacing);
   const isPaused = useGameStore(selectIsPaused);
 
+  // Loading state for initial app load
+  const isInitializing = gameState === GameState.IDLE;
+
   // Get current race data
   const currentRace = raceExecution.currentRace;
   const currentDistance = currentRace?.distance ?? 0;
@@ -194,16 +197,22 @@ function App() {
               <Button
                 onClick={handleGenerateProgram}
                 disabled={!canGenerateSchedule}
+                loading={isInitializing}
               >
                 {isMobile ? "PROGRAM" : "GENERATE PROGRAM"}
               </Button>
               <Button
                 onClick={handleStartPause}
                 disabled={isStartPauseDisabled}
+                loading={isInitializing}
               >
                 {getStartPauseLabel()}
               </Button>
-              <Button onClick={handleResetGame} disabled={isRacing}>
+              <Button
+                onClick={handleResetGame}
+                disabled={isRacing}
+                loading={isInitializing}
+              >
                 {isMobile ? "RESET" : "RESET GAME"}
               </Button>
             </ButtonGroup>

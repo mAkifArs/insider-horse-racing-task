@@ -5,7 +5,8 @@ import DataTable, { Column } from "../../DataTable";
 import Typography from "../../Typography";
 import { RaceResult, RaceResultEntry } from "../../../types";
 import { ResultsProps } from "./types";
-import { spacing } from "../../../theme";
+import { spacing, colors } from "../../../theme";
+import { formatRoundLabel } from "../../../utils/formatters";
 
 /**
  * Data structure for displaying a result entry in the table
@@ -35,7 +36,7 @@ const RoundSection = styled.div`
 `;
 
 const RoundHeader = styled.div`
-  background-color: #90ee90; /* Green for completed races */
+  background-color: ${colors.success.light};
   padding: ${spacing.xs} ${spacing.sm};
   text-align: center;
 `;
@@ -48,21 +49,6 @@ const EmptyMessage = styled.div`
   padding: ${spacing.xl};
   text-align: center;
 `;
-
-/**
- * Format round label for display
- */
-const formatRoundLabel = (roundNumber: number, distance: number): string => {
-  const suffix =
-    roundNumber === 1
-      ? "ST"
-      : roundNumber === 2
-      ? "ND"
-      : roundNumber === 3
-      ? "RD"
-      : "TH";
-  return `${roundNumber}${suffix} Lap - ${distance}m`;
-};
 
 /**
  * Table columns for results

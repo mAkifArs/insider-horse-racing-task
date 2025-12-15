@@ -44,4 +44,3 @@ export const useAnimationFrame = (
     };
   }, [callback, isActive]);
 };
-

@@ -6,6 +6,7 @@ import { useGameStore, selectRaceExecution } from "../../../store";
 import { HorsePosition, RaceResultEntry, GameState } from "../../../types";
 import { useAnimationFrame } from "../../../hooks/useAnimationFrame";
 import { fontSize, fontWeight, colors, spacing } from "../../../theme";
+import { formatRoundLabel } from "../../../utils/formatters";
 import HorseSvg from "./HorseSvg";
 
 const TrackContainer = styled.div`
@@ -130,11 +131,10 @@ const EmptyMessage = styled.div`
 `;
 
 /**
- * Format lap label for display
+ * Base distance for race duration calculation
+ * Longer races take proportionally more time
  */
-const formatLapLabel = (roundNumber: number, distance: number): string => {
-  return `${roundNumber}.st Lap ${distance}m`;
-};
+const BASE_DISTANCE = 1200;
 
 const RaceTrack: React.FC<RaceTrackProps> = memo(
   ({ currentRace, horses, horsePositions, isAnimating, distance }) => {
@@ -169,8 +169,10 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
 
             // Random speed variation + base speed from horse condition
             const speedVariation = 0.8 + Math.random() * 0.4;
-            // Divide by 100 for ~5-7 second races
-            const moveAmount = hp.speed * speedVariation * (deltaTime / 100);
+            // Factor in distance: longer races take proportionally more time
+            const distanceMultiplier = currentRace.distance / BASE_DISTANCE;
+            // Divide by 100 for base ~5-7 second races, scaled by distance
+            const moveAmount = hp.speed * speedVariation * (deltaTime / (100 * distanceMultiplier));
             const newPosition = Math.min(hp.position + moveAmount, 100);
 
             // Track finish time when horse crosses finish line
@@ -279,7 +281,7 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
         </LanesContainer>
         <RaceInfo>
           <Typography variant="body2" bold>
-            {formatLapLabel(currentRace.roundNumber, distance)}
+            {formatRoundLabel(currentRace.roundNumber, distance)}
           </Typography>
         </RaceInfo>
       </TrackContainer>

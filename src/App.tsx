@@ -131,7 +131,6 @@ function App() {
 
   // Get current race data
   const currentRace = raceExecution.currentRace;
-  const currentDistance = currentRace?.distance ?? 0;
 
   // Zustand store actions
   const initializeHorses = useGameStore((state) => state.initializeHorses);
@@ -227,7 +226,6 @@ function App() {
               currentRace={currentRace}
               horses={horses}
               isAnimating={raceExecution.isAnimating}
-              distance={currentDistance}
             />
           </CenterPanel>
           <RightPanel>

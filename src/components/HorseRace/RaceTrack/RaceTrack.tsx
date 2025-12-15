@@ -184,7 +184,7 @@ const getDisplayPosition = (positionPercent: number): number => {
  * - Empty state messages
  */
 const RaceTrack: React.FC<RaceTrackProps> = memo(
-  ({ currentRace, horses, isAnimating, distance }) => {
+  ({ currentRace, horses, isAnimating }) => {
     // Get game state for empty message logic
     const gameState = useGameStore((state) => state.gameState);
     const results = useGameStore(selectResults);
@@ -247,7 +247,7 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
         </LanesContainer>
         <RaceInfo>
           <Typography variant="body2" bold>
-            {formatRoundLabel(currentRace.roundNumber, distance)}
+            {formatRoundLabel(currentRace.roundNumber, currentRace.distance)}
           </Typography>
         </RaceInfo>
       </TrackContainer>

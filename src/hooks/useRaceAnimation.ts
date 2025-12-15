@@ -1,7 +1,14 @@
 import { useCallback } from "react";
 import { useAnimationFrame } from "./useAnimationFrame";
 import { useGameStore, selectRaceExecution } from "../store";
-import { Horse, HorsePosition, RaceResultEntry, GameState, Race } from "../types";
+import { Horse, HorsePosition, GameState, Race } from "../types";
+import {
+  calculateNewPosition,
+  generateSpeedVariation,
+  calculateDistanceMultiplier,
+  checkAllFinished,
+  compileRaceResults,
+} from "./raceAnimationUtils";
 
 /**
  * =============================================================================
@@ -17,22 +24,10 @@ import { Horse, HorsePosition, RaceResultEntry, GameState, Race } from "../types
  * This separates business logic from the presentation layer (RaceTrack component)
  *
  * Benefits:
- * - Testable: Can unit test animation logic independently
+ * - Testable: Pure functions extracted to raceAnimationUtils.ts
  * - Reusable: Could be used for replays, previews, simulations
  * - Maintainable: Change logic without touching UI
  */
-
-/**
- * Base distance for race duration calculation
- * Longer races take proportionally more time
- */
-const BASE_DISTANCE = 1200;
-
-/**
- * Speed divisor - lower = faster races
- * 50 = ~3-4 second base races
- */
-const SPEED_DIVISOR = 50;
 
 interface UseRaceAnimationProps {
   currentRace: Race | null;
@@ -70,64 +65,6 @@ export const useRaceAnimation = ({
   );
 
   /**
-   * Calculate new position for a single horse
-   */
-  const calculateNewPosition = useCallback(
-    (hp: HorsePosition, deltaTime: number, distanceMultiplier: number): HorsePosition => {
-      // If already finished, don't move
-      if (hp.finishTime !== undefined) {
-        return hp;
-      }
-
-      const now = Date.now();
-
-      // Random speed variation (0.8 - 1.2) + base speed from horse condition
-      const speedVariation = 0.8 + Math.random() * 0.4;
-
-      // Calculate movement amount based on speed, time, and distance
-      const moveAmount =
-        hp.speed * speedVariation * (deltaTime / (SPEED_DIVISOR * distanceMultiplier));
-
-      const newPosition = Math.min(hp.position + moveAmount, 100);
-
-      // Track finish time when horse crosses finish line
-      const justFinished = hp.position < 100 && newPosition >= 100;
-
-      return {
-        ...hp,
-        position: newPosition,
-        finishTime: justFinished ? now : hp.finishTime,
-      };
-    },
-    []
-  );
-
-  /**
-   * Compile race results from finished positions
-   */
-  const compileRaceResults = useCallback(
-    (positions: HorsePosition[], animationStartTime: number | undefined): RaceResultEntry[] => {
-      const now = Date.now();
-
-      // Sort by finish time (earlier = better position)
-      const sortedPositions = [...positions].sort(
-        (a, b) => (a.finishTime || 0) - (b.finishTime || 0)
-      );
-
-      return sortedPositions.map((hp, index) => {
-        const horse = horses.find((h) => h.id === hp.horseId);
-        return {
-          horseId: hp.horseId,
-          position: index + 1,
-          time: (hp.finishTime || now) - (animationStartTime || 0),
-          horse: horse!,
-        };
-      });
-    },
-    [horses]
-  );
-
-  /**
    * Main animation callback - updates horse positions each frame
    */
   const animate = useCallback(
@@ -136,26 +73,33 @@ export const useRaceAnimation = ({
         return;
       }
 
-      // Calculate distance multiplier (longer races = slower movement)
-      const distanceMultiplier = currentRace.distance / BASE_DISTANCE;
+      const now = Date.now();
+      const distanceMultiplier = calculateDistanceMultiplier(
+        currentRace.distance
+      );
 
       // Calculate new positions for all horses
       const newPositions: HorsePosition[] = raceExecution.horsePositions.map(
-        (hp) => calculateNewPosition(hp, deltaTime, distanceMultiplier)
+        (hp) =>
+          calculateNewPosition(
+            hp,
+            deltaTime,
+            distanceMultiplier,
+            generateSpeedVariation(),
+            now
+          )
       );
 
       // Update positions in store
       updateHorsePositions(newPositions);
 
       // Check if all horses have finished
-      const allFinished = newPositions.every(
-        (hp) => hp.finishTime !== undefined
-      );
-
-      if (allFinished) {
+      if (checkAllFinished(newPositions)) {
         const results = compileRaceResults(
           newPositions,
-          raceExecution.animationStartTime
+          horses,
+          raceExecution.animationStartTime,
+          now
         );
         completeCurrentRace(results);
       }
@@ -166,8 +110,7 @@ export const useRaceAnimation = ({
       gameState,
       raceExecution.horsePositions,
       raceExecution.animationStartTime,
-      calculateNewPosition,
-      compileRaceResults,
+      horses,
       updateHorsePositions,
       completeCurrentRace,
     ]
@@ -182,4 +125,3 @@ export const useRaceAnimation = ({
     isActive: shouldAnimate,
   };
 };
-

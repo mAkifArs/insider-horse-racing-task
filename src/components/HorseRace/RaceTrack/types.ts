@@ -11,12 +11,4 @@ export interface RaceTrackProps {
   horses: Horse[];
   /** Whether the race animation should be running */
   isAnimating: boolean;
-  /** Race distance in meters (for display) */
-  distance: number;
-}
-
-export interface HorseLaneProps {
-  horse: Horse;
-  position: HorsePosition;
-  laneNumber: number;
 }

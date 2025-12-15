@@ -174,6 +174,10 @@ function App() {
   const getStartPauseLabel = () => {
     if (isPaused) return "RESUME";
     if (isRacing) return "PAUSE";
+    // Show CONTINUE if there are already completed races (restored session)
+    if (results.length > 0 && gameState === GameState.SCHEDULE_READY) {
+      return "CONTINUE";
+    }
     return "START";
   };
 

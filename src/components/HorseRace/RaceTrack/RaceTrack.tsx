@@ -146,6 +146,11 @@ const getEmptyMessage = (
   resultsCount: number
 ): string => {
   if (gameState === GameState.SCHEDULE_READY) {
+    // Check if there are already completed races (restored from localStorage)
+    if (resultsCount > 0) {
+      const nextRound = resultsCount + 1;
+      return `Click "CONTINUE" to resume racing (Round ${nextRound}/6)`;
+    }
     return 'Click "START" to begin racing';
   }
   if (gameState === GameState.COMPLETED) {

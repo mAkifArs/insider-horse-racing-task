@@ -31,4 +31,3 @@ export const formatRoundLabel = (
   const suffix = getOrdinalSuffix(roundNumber);
   return `${roundNumber}${suffix} Lap - ${distance}m`;
 };
-

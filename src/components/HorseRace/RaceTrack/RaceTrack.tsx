@@ -2,7 +2,11 @@ import React, { memo, useCallback } from "react";
 import styled from "styled-components";
 import Typography from "../../Typography";
 import { RaceTrackProps } from "./types";
-import { useGameStore, selectRaceExecution } from "../../../store";
+import {
+  useGameStore,
+  selectRaceExecution,
+  selectResults,
+} from "../../../store";
 import { HorsePosition, RaceResultEntry, GameState } from "../../../types";
 import { useAnimationFrame } from "../../../hooks/useAnimationFrame";
 import { fontSize, fontWeight, colors, spacing } from "../../../theme";
@@ -140,6 +144,7 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
   ({ currentRace, horses, horsePositions, isAnimating, distance }) => {
     const raceExecution = useGameStore(selectRaceExecution);
     const gameState = useGameStore((state) => state.gameState);
+    const results = useGameStore(selectResults);
     const updateHorsePositions = useGameStore(
       (state) => state.updateHorsePositions
     );
@@ -171,8 +176,11 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
             const speedVariation = 0.8 + Math.random() * 0.4;
             // Factor in distance: longer races take proportionally more time
             const distanceMultiplier = currentRace.distance / BASE_DISTANCE;
-            // Divide by 100 for base ~5-7 second races, scaled by distance
-            const moveAmount = hp.speed * speedVariation * (deltaTime / (100 * distanceMultiplier));
+            // Divide by 50 for base ~3-4 second races, scaled by distance
+            const moveAmount =
+              hp.speed *
+              speedVariation *
+              (deltaTime / (50 * distanceMultiplier));
             const newPosition = Math.min(hp.position + moveAmount, 100);
 
             // Track finish time when horse crosses finish line
@@ -233,15 +241,27 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
 
     // No race to display
     if (!currentRace) {
+      // Determine the appropriate message
+      const getMessage = () => {
+        if (gameState === GameState.SCHEDULE_READY) {
+          return 'Click "START" to begin racing';
+        }
+        if (gameState === GameState.COMPLETED) {
+          return "All races completed! 🏆";
+        }
+        // Between races - show next race message
+        if (gameState === GameState.RACING && results.length > 0) {
+          const nextRound = results.length + 1;
+          return `Next race starting... (Round ${nextRound}/6)`;
+        }
+        return "Generate a program to start racing";
+      };
+
       return (
         <TrackContainer>
           <EmptyMessage>
             <Typography variant="body1" color="secondary">
-              {gameState === GameState.SCHEDULE_READY
-                ? 'Click "START" to begin racing'
-                : gameState === GameState.COMPLETED
-                ? "All races completed!"
-                : "Generate a program to start racing"}
+              {getMessage()}
             </Typography>
           </EmptyMessage>
         </TrackContainer>

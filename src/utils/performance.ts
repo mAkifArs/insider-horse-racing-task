@@ -39,12 +39,16 @@ export const debounce = <T extends (...args: any[]) => any>(
 
 /**
  * Request Animation Frame wrapper for smooth animations
+ * The callback receives a DOMHighResTimeStamp (time in ms since page load)
  */
-export const requestAnimationFrame = (callback: () => void): number => {
+export const requestAnimationFrame = (
+  callback: (time: number) => void
+): number => {
   if (typeof window !== "undefined" && window.requestAnimationFrame) {
     return window.requestAnimationFrame(callback);
   }
-  return setTimeout(callback, 16) as unknown as number;
+  // Fallback: pass performance.now() as timestamp
+  return setTimeout(() => callback(performance.now()), 16) as unknown as number;
 };
 
 /**

@@ -14,18 +14,18 @@ export const useAnimationFrame = (
   callback: (deltaTime: number) => void,
   isActive: boolean = true
 ): void => {
-  const requestRef = useRef<number>();
-  const previousTimeRef = useRef<number>();
+  const requestRef = useRef<number | null>(null);
+  const previousTimeRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!isActive) {
       // Reset the previous time when inactive so resume doesn't cause a jump
-      previousTimeRef.current = undefined;
+      previousTimeRef.current = null;
       return;
     }
 
     const animate = (time: number) => {
-      if (previousTimeRef.current !== undefined) {
+      if (previousTimeRef.current !== null) {
         const deltaTime = time - previousTimeRef.current;
         // Cap deltaTime to prevent jumps (max 100ms = ~10fps minimum)
         const cappedDeltaTime = Math.min(deltaTime, 100);
@@ -38,7 +38,7 @@ export const useAnimationFrame = (
     requestRef.current = requestAnimationFrame(animate);
 
     return () => {
-      if (requestRef.current !== undefined) {
+      if (requestRef.current !== null) {
         cancelAnimationFrame(requestRef.current);
       }
     };

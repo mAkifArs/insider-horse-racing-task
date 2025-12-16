@@ -6,25 +6,20 @@ import {
   useGameStore,
   selectHorses,
   selectGameState,
-  selectSchedule,
-  selectCurrentRoundIndex,
-  selectRaceExecution,
   selectResults,
 } from "./store";
 import { GameState } from "./types";
 import styles from "./App.module.scss";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPONENT
-// ─────────────────────────────────────────────────────────────────────────────
-
+/**
+ * App Component
+ *
+ * Main layout component. Child components manage their own store subscriptions.
+ */
 function App() {
-  // Store state for layout components
+  // Store state for components that still need props
   const horses = useGameStore(selectHorses);
   const gameState = useGameStore(selectGameState);
-  const schedule = useGameStore(selectSchedule);
-  const currentRoundIndex = useGameStore(selectCurrentRoundIndex);
-  const raceExecution = useGameStore(selectRaceExecution);
   const results = useGameStore(selectResults);
 
   // Store actions
@@ -37,10 +32,6 @@ function App() {
     }
   }, [gameState, initializeHorses]);
 
-  // ─────────────────────────────────────────────────────────────────────────
-  // RENDER
-  // ─────────────────────────────────────────────────────────────────────────
-
   return (
     <ErrorBoundary>
       <div className={styles.appContainer}>
@@ -50,18 +41,10 @@ function App() {
             <HorseList horses={horses} />
           </div>
           <div className={styles.centerPanel}>
-            <RaceTrack
-              currentRace={raceExecution.currentRace}
-              horses={horses}
-              isAnimating={raceExecution.isAnimating}
-            />
+            <RaceTrack />
           </div>
           <div className={styles.rightPanel}>
-            <Program
-              schedule={schedule}
-              horses={horses}
-              currentRoundIndex={currentRoundIndex}
-            />
+            <Program />
             <Results results={results} />
           </div>
         </main>

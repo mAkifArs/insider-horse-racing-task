@@ -1,13 +1,7 @@
 import { useCallback, useMemo } from "react";
 import { useAnimationFrame } from "./useAnimationFrame";
-import { useGameStore, selectRaceExecution } from "../store";
-import {
-  Horse,
-  HorsePosition,
-  RaceHorseState,
-  GameState,
-  Race,
-} from "../types";
+import { useGameStore, selectRaceExecution, selectHorses } from "../store";
+import { Horse, HorsePosition, RaceHorseState, GameState } from "../types";
 import {
   calculateNewPosition,
   generateSpeedVariation,
@@ -27,20 +21,13 @@ import {
  * - Finish line detection
  * - Race completion and results compilation
  *
- * This separates business logic from the presentation layer (RaceTrack component)
+ * Gets all data from store - no props drilling needed.
  *
  * Benefits:
  * - Testable: Pure functions extracted to raceAnimationUtils.ts
- * - Reusable: Could be used for replays, previews, simulations
- * - Maintainable: Change logic without touching UI
+ * - Self-contained: Gets own data from store
  * - Performance: Pre-joins horse data to avoid lookups during render
  */
-
-interface UseRaceAnimationProps {
-  currentRace: Race | null;
-  horses: Horse[];
-  isAnimating: boolean;
-}
 
 interface UseRaceAnimationReturn {
   /** Race horses with positions - pre-joined for efficient rendering */
@@ -51,19 +38,15 @@ interface UseRaceAnimationReturn {
 
 /**
  * Hook that manages race animation logic
- *
- * @param currentRace - The current race being run (null if no race)
- * @param horses - Array of all horses (for looking up horse data)
- * @param isAnimating - Whether animation should be running
- * @returns Object containing enriched horse data with positions
+ * Gets all needed data from store directly
  */
-export const useRaceAnimation = ({
-  currentRace,
-  horses,
-  isAnimating,
-}: UseRaceAnimationProps): UseRaceAnimationReturn => {
+export const useRaceAnimation = (): UseRaceAnimationReturn => {
+  // Store state
   const raceExecution = useGameStore(selectRaceExecution);
+  const horses = useGameStore(selectHorses);
   const gameState = useGameStore((state) => state.gameState);
+
+  // Store actions
   const updateHorsePositions = useGameStore(
     (state) => state.updateHorsePositions
   );
@@ -71,7 +54,11 @@ export const useRaceAnimation = ({
     (state) => state.completeCurrentRace
   );
 
-  // Create horse lookup map for O(1) access (stable reference)
+  // Derived state
+  const currentRace = raceExecution.currentRace;
+  const isAnimating = raceExecution.isAnimating;
+
+  // Create horse lookup map for O(1) access
   const horseMap = useMemo(() => {
     const map = new Map<string, Horse>();
     horses.forEach((horse) => map.set(horse.id, horse));
@@ -135,7 +122,6 @@ export const useRaceAnimation = ({
   useAnimationFrame(animate, shouldAnimate);
 
   // Pre-join horse data with positions for efficient rendering
-  // This eliminates multiple .find() calls in RaceTrack
   const raceHorses = useMemo((): RaceHorseState[] => {
     const result: RaceHorseState[] = [];
     for (const hp of raceExecution.horsePositions) {

@@ -1,4 +1,4 @@
-@use './styles/variables' as *;
+@use "./styles/variables" as *;
 
 .appContainer {
   height: 100vh;
@@ -70,14 +70,3 @@
     gap: $spacing-md;
   }
 }
-
-.buttonGroup {
-  display: flex;
-  gap: $spacing-sm;
-
-  @media (max-width: $breakpoint-mobile) {
-    width: 100%;
-    justify-content: center;
-  }
-}
-

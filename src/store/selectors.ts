@@ -41,11 +41,7 @@ export const selectCurrentRoundIndex = (state: GameStore) =>
 export const selectCurrentRace = (state: GameStore) =>
   state.schedule?.[state.currentRoundIndex] ?? null;
 
-/** Check if user can generate a new schedule */
+/** Check if user can generate a new schedule (multi-condition business rule) */
 export const selectCanGenerateSchedule = (state: GameStore) =>
   state.gameState === GameState.HORSES_READY ||
   state.gameState === GameState.COMPLETED;
-
-/** Check if user can start racing */
-export const selectCanStartRace = (state: GameStore) =>
-  state.gameState === GameState.SCHEDULE_READY;

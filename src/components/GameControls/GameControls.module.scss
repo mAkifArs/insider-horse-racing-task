@@ -1,0 +1,12 @@
+@use "../../styles/variables" as *;
+
+.buttonGroup {
+  display: flex;
+  gap: $spacing-sm;
+
+  @media (max-width: $breakpoint-mobile) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+

@@ -1,37 +1,53 @@
-import React, { memo } from "react";
-import { RaceHorseState } from "../../../types";
+import React, { memo, useEffect, useRef } from "react";
+import { Horse } from "../../../types";
 import { getDisplayPosition } from "./raceTrackUtils";
 import HorseSvg from "./HorseSvg";
 import styles from "./RaceTrack.module.scss";
 
 interface RaceLaneProps {
-  raceHorse: RaceHorseState;
+  horse: Horse;
+  initialPosition: number;
   laneNumber: number;
+  /** Callback to register the horse element ref for direct DOM updates */
+  onRegisterRef: (horseId: string, element: HTMLDivElement | null) => void;
 }
 
 /**
  * RaceLane Component
  *
  * Renders a single lane with horse icon.
- * Position is calculated from race progress.
+ * Uses ref-based animation for performance - position is updated directly via DOM.
  */
-const RaceLane: React.FC<RaceLaneProps> = memo(({ raceHorse, laneNumber }) => {
-  const displayPosition = getDisplayPosition(raceHorse.position);
+const RaceLane: React.FC<RaceLaneProps> = memo(
+  ({ horse, initialPosition, laneNumber, onRegisterRef }) => {
+    const horseWrapperRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <div className={styles.lane}>
-      <div className={styles.laneNumber}>{laneNumber}</div>
-      <div className={styles.trackArea}>
-        <div
-          className={styles.horseIconWrapper}
-          style={{ left: `${displayPosition}%` }}
-        >
-          <HorseSvg color={raceHorse.horse.color} size={36} />
+    // Register ref on mount, unregister on unmount
+    useEffect(() => {
+      onRegisterRef(horse.id, horseWrapperRef.current);
+      return () => {
+        onRegisterRef(horse.id, null);
+      };
+    }, [horse.id, onRegisterRef]);
+
+    const displayPosition = getDisplayPosition(initialPosition);
+
+    return (
+      <div className={styles.lane}>
+        <div className={styles.laneNumber}>{laneNumber}</div>
+        <div className={styles.trackArea}>
+          <div
+            ref={horseWrapperRef}
+            className={styles.horseIconWrapper}
+            style={{ left: `${displayPosition}%` }}
+          >
+            <HorseSvg color={horse.color} size={36} />
+          </div>
         </div>
       </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 RaceLane.displayName = "RaceLane";
 

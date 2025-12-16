@@ -3,7 +3,7 @@
  */
 
 // Horse types
-export type { Horse, HorsePosition, RaceHorseState } from "./horse";
+export type { Horse, HorsePosition } from "./horse";
 
 // Race types
 export type {

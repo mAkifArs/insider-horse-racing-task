@@ -25,7 +25,7 @@
  *   ├── Horse Actions .......... initializeHorses
  *   ├── Schedule Actions ....... generateSchedule
  *   ├── Race Control Actions ... startRacing, pauseRacing, resumeRacing
- *   ├── Race Execution Actions . startNextRace, updateHorsePositions, completeCurrentRace
+ *   ├── Race Execution Actions . startNextRace, completeCurrentRace
  *   └── Reset Actions .......... resetGame
  * - Persistence Config ......... bottom of file
  *
@@ -39,7 +39,6 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import {
   Horse,
-  HorsePosition,
   Race,
   RaceResult,
   RaceResultEntry,
@@ -87,9 +86,8 @@ interface GameStoreActions {
   pauseRacing: () => void;
   resumeRacing: () => void;
 
-  // Race Execution (called by RaceTrack component)
+  // Race Execution (called by animation hook)
   startNextRace: () => void;
-  updateHorsePositions: (positions: HorsePosition[]) => void;
   completeCurrentRace: (results: RaceResultEntry[]) => void;
 
   // Game Reset
@@ -319,25 +317,6 @@ export const useGameStore = create<GameStore>()(
             },
             false,
             "startNextRace"
-          );
-        },
-
-        /**
-         * Update horse positions during animation
-         * Called every animation frame by RaceTrack
-         *
-         * @param positions - New positions for all horses
-         */
-        updateHorsePositions: (positions: HorsePosition[]) => {
-          set(
-            (state) => ({
-              raceExecution: {
-                ...state.raceExecution,
-                horsePositions: positions,
-              },
-            }),
-            false,
-            "updateHorsePositions"
           );
         },
 

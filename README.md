@@ -116,9 +116,15 @@ That's it! The game will load with 20 horses ready to race.
 
 ## 📁 Project Structure
 
+### Feature-Based Component Architecture
+
 ```
 src/
 ├── components/
+│   │
+│   │── # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+│   │── # SHARED COMPONENTS (Reusable across the app)
+│   │── # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 │   ├── AppBar/              # App header with title
 │   ├── Button/              # Reusable button component
 │   ├── DataTable/           # Generic table component
@@ -126,11 +132,28 @@ src/
 │   ├── GameControls/        # Start/Pause/Reset buttons
 │   ├── Panel/               # Container component
 │   ├── Typography/          # Text component
-│   └── HorseRace/           # Feature components
+│   │
+│   │── # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+│   │── # FEATURE COMPONENTS (Domain-specific)
+│   │── # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+│   └── HorseRace/           # 🏇 Horse Racing Feature
+│       ├── index.ts         # Barrel export for feature
 │       ├── HorseList/       # Horse listing table
+│       │   ├── HorseList.tsx
+│       │   ├── HorseList.module.scss
+│       │   └── types.ts
 │       ├── Program/         # Race schedule display
-│       ├── RaceTrack/       # Race visualization
+│       │   ├── Program.tsx
+│       │   ├── ProgramRound.tsx
+│       │   └── Program.module.scss
+│       ├── RaceTrack/       # Race visualization + animation
+│       │   ├── RaceTrack.tsx
+│       │   ├── RaceLane.tsx
+│       │   ├── HorseSvg.tsx
+│       │   └── RaceTrack.module.scss
 │       └── Results/         # Race results display
+│           ├── Results.tsx
+│           └── Results.module.scss
 │
 ├── hooks/
 │   ├── useRefBasedRaceAnimation.ts  # ⚡ Optimized animation hook
@@ -157,6 +180,20 @@ src/
 └── styles/
     └── _variables.scss      # Design tokens
 ```
+
+### Component Organization
+
+| Type                   | Location                           | Purpose                                     |
+| ---------------------- | ---------------------------------- | ------------------------------------------- |
+| **Shared Components**  | `components/Button`, `Panel`, etc. | Reusable UI primitives used across the app  |
+| **Feature Components** | `components/HorseRace/*`           | Domain-specific components for horse racing |
+
+Each component folder contains:
+
+- `ComponentName.tsx` — Component logic
+- `ComponentName.module.scss` — Scoped styles
+- `types.ts` — Component-specific types (if needed)
+- `index.ts` — Barrel export
 
 ---
 

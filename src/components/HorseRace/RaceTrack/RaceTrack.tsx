@@ -20,7 +20,6 @@ const getEmptyMessage = (
   resultsCount: number
 ): string => {
   if (gameState === GameState.SCHEDULE_READY) {
-    // Check if there are already completed races (restored from localStorage)
     if (resultsCount > 0) {
       const nextRound = resultsCount + 1;
       return `Click "CONTINUE" to resume racing (Round ${nextRound}/6)`;
@@ -30,7 +29,6 @@ const getEmptyMessage = (
   if (gameState === GameState.COMPLETED) {
     return "All races completed! 🏆";
   }
-  // Between races - show next race message
   if (gameState === GameState.RACING && resultsCount > 0) {
     const nextRound = resultsCount + 1;
     return `Next race starting... (Round ${nextRound}/6)`;
@@ -57,7 +55,7 @@ const getDisplayPosition = (positionPercent: number): number => {
  *
  * Features:
  * - 10 lanes with lane numbers
- * - Animated horse icons
+ * - Animated horse icons (pre-joined data, no lookups in render)
  * - Finish line
  * - Race info display
  * - Empty state messages
@@ -68,8 +66,8 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
     const gameState = useGameStore((state) => state.gameState);
     const results = useGameStore(selectResults);
 
-    // Use race animation hook - handles all position calculations
-    const { horsePositions } = useRaceAnimation({
+    // Use race animation hook - returns pre-joined horse data with positions
+    const { raceHorses } = useRaceAnimation({
       currentRace,
       horses,
       isAnimating,
@@ -95,29 +93,21 @@ const RaceTrack: React.FC<RaceTrackProps> = memo(
     // RACE VIEW
     // ─────────────────────────────────────────────────────────────────────────
 
-    // Get horses participating in this race
-    const raceHorses = currentRace.horseIds
-      .map((id) => horses.find((h) => h.id === id))
-      .filter((h): h is NonNullable<typeof h> => h !== undefined);
-
     return (
       <div className={styles.trackContainer}>
         <div className={styles.lanesContainer}>
-          {raceHorses.map((horse, index) => {
-            const position = horsePositions.find(
-              (hp) => hp.horseId === horse.id
-            );
-            const displayPosition = getDisplayPosition(position?.position ?? 0);
+          {raceHorses.map((raceHorse, index) => {
+            const displayPosition = getDisplayPosition(raceHorse.position);
 
             return (
-              <div key={horse.id} className={styles.lane}>
+              <div key={raceHorse.horse.id} className={styles.lane}>
                 <div className={styles.laneNumber}>{index + 1}</div>
                 <div className={styles.trackArea}>
                   <div
                     className={styles.horseIconWrapper}
                     style={{ left: `${displayPosition}%` }}
                   >
-                    <HorseSvg color={horse.color} size={36} />
+                    <HorseSvg color={raceHorse.horse.color} size={36} />
                   </div>
                 </div>
               </div>

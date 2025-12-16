@@ -14,8 +14,6 @@ import {
   selectResults,
   selectCanGenerateSchedule,
   selectCanStartRace,
-  selectIsRacing,
-  selectIsPaused,
 } from "./store";
 import { GameState } from "./types";
 import styles from "./App.module.scss";
@@ -37,11 +35,11 @@ function App() {
   const results = useGameStore(selectResults);
   const canGenerateSchedule = useGameStore(selectCanGenerateSchedule);
   const canStartRace = useGameStore(selectCanStartRace);
-  const isRacing = useGameStore(selectIsRacing);
-  const isPaused = useGameStore(selectIsPaused);
 
-  // Loading state for initial app load
+  // Derived state from gameState enum
   const isInitializing = gameState === GameState.IDLE;
+  const isRacing = gameState === GameState.RACING;
+  const isPaused = gameState === GameState.PAUSED;
 
   // Get current race data
   const currentRace = raceExecution.currentRace;

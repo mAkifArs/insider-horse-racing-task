@@ -15,7 +15,7 @@ export interface Horse {
 
 /**
  * Horse position during a race
- * Used for race track visualization and animation
+ * Used internally by the store for tracking race state
  */
 export interface HorsePosition {
   /** Horse ID */
@@ -30,3 +30,19 @@ export interface HorsePosition {
   finishTime?: number;
 }
 
+/**
+ * Combined horse + position for rendering
+ * Pre-joined to avoid lookups during render
+ */
+export interface RaceHorseState {
+  /** Full horse data */
+  horse: Horse;
+  /** Current position in the race (0-100% of track) */
+  position: number;
+  /** Current lane number (1-10) */
+  lane: number;
+  /** Current speed multiplier */
+  speed: number;
+  /** Time when horse crossed finish line (undefined if not finished) */
+  finishTime?: number;
+}

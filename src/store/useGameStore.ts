@@ -461,8 +461,6 @@ export {
   selectRaceExecution,
   selectCurrentRoundIndex,
   selectCurrentRace,
-  selectIsRacing,
-  selectIsPaused,
   selectCanGenerateSchedule,
   selectCanStartRace,
 } from "./selectors";

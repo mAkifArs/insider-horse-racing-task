@@ -1,7 +1,13 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useAnimationFrame } from "./useAnimationFrame";
 import { useGameStore, selectRaceExecution } from "../store";
-import { Horse, HorsePosition, GameState, Race } from "../types";
+import {
+  Horse,
+  HorsePosition,
+  RaceHorseState,
+  GameState,
+  Race,
+} from "../types";
 import {
   calculateNewPosition,
   generateSpeedVariation,
@@ -27,6 +33,7 @@ import {
  * - Testable: Pure functions extracted to raceAnimationUtils.ts
  * - Reusable: Could be used for replays, previews, simulations
  * - Maintainable: Change logic without touching UI
+ * - Performance: Pre-joins horse data to avoid lookups during render
  */
 
 interface UseRaceAnimationProps {
@@ -36,8 +43,8 @@ interface UseRaceAnimationProps {
 }
 
 interface UseRaceAnimationReturn {
-  /** Current positions of all horses in the race */
-  horsePositions: HorsePosition[];
+  /** Race horses with positions - pre-joined for efficient rendering */
+  raceHorses: RaceHorseState[];
   /** Whether animation is currently active */
   isActive: boolean;
 }
@@ -48,7 +55,7 @@ interface UseRaceAnimationReturn {
  * @param currentRace - The current race being run (null if no race)
  * @param horses - Array of all horses (for looking up horse data)
  * @param isAnimating - Whether animation should be running
- * @returns Object containing horse positions and animation state
+ * @returns Object containing enriched horse data with positions
  */
 export const useRaceAnimation = ({
   currentRace,
@@ -63,6 +70,13 @@ export const useRaceAnimation = ({
   const completeCurrentRace = useGameStore(
     (state) => state.completeCurrentRace
   );
+
+  // Create horse lookup map for O(1) access (stable reference)
+  const horseMap = useMemo(() => {
+    const map = new Map<string, Horse>();
+    horses.forEach((horse) => map.set(horse.id, horse));
+    return map;
+  }, [horses]);
 
   /**
    * Main animation callback - updates horse positions each frame
@@ -120,8 +134,27 @@ export const useRaceAnimation = ({
   const shouldAnimate = isAnimating && gameState === GameState.RACING;
   useAnimationFrame(animate, shouldAnimate);
 
+  // Pre-join horse data with positions for efficient rendering
+  // This eliminates multiple .find() calls in RaceTrack
+  const raceHorses = useMemo((): RaceHorseState[] => {
+    const result: RaceHorseState[] = [];
+    for (const hp of raceExecution.horsePositions) {
+      const horse = horseMap.get(hp.horseId);
+      if (horse) {
+        result.push({
+          horse,
+          position: hp.position,
+          lane: hp.lane,
+          speed: hp.speed,
+          finishTime: hp.finishTime,
+        });
+      }
+    }
+    return result;
+  }, [raceExecution.horsePositions, horseMap]);
+
   return {
-    horsePositions: raceExecution.horsePositions,
+    raceHorses,
     isActive: shouldAnimate,
   };
 };

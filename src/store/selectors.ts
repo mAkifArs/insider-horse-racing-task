@@ -34,20 +34,12 @@ export const selectCurrentRoundIndex = (state: GameStore) =>
   state.currentRoundIndex;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// COMPUTED SELECTORS - Derived state
+// COMPUTED SELECTORS - Business logic
 // ─────────────────────────────────────────────────────────────────────────────
 
 /** Get current race from schedule (null if no race active) */
 export const selectCurrentRace = (state: GameStore) =>
   state.schedule?.[state.currentRoundIndex] ?? null;
-
-/** Check if game is currently racing */
-export const selectIsRacing = (state: GameStore) =>
-  state.gameState === GameState.RACING;
-
-/** Check if game is paused */
-export const selectIsPaused = (state: GameStore) =>
-  state.gameState === GameState.PAUSED;
 
 /** Check if user can generate a new schedule */
 export const selectCanGenerateSchedule = (state: GameStore) =>

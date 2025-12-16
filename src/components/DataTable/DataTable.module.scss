@@ -1,0 +1,49 @@
+@use '../../styles/variables' as *;
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: $font-size-sm;
+}
+
+.thead {
+  background-color: $color-neutral-gray100;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.tr {
+  &:nth-child(even) {
+    background-color: $color-neutral-gray50;
+  }
+
+  &:hover {
+    background-color: $color-neutral-gray200;
+  }
+}
+
+.th {
+  padding: $spacing-sm;
+  border-bottom: 1px solid $color-neutral-gray300;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-xs;
+  color: $color-text-primary;
+}
+
+.td {
+  padding: 6px $spacing-sm;
+  border-bottom: 1px solid $color-neutral-gray200;
+  vertical-align: middle;
+}
+
+.rowNumberCell {
+  text-align: center;
+  color: $color-text-secondary;
+  width: 40px;
+}
+
+.left { text-align: left; }
+.center { text-align: center; }
+.right { text-align: right; }
+

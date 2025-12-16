@@ -1,0 +1,39 @@
+@use '../../../styles/variables' as *;
+
+.panel {
+  min-width: 240px;
+  max-width: 240px;
+  height: 100%;
+
+  @media (max-width: 1024px) {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+    height: auto;
+    max-height: 400px;
+  }
+}
+
+.roundSection {
+  margin-bottom: $spacing-sm;
+}
+
+.roundHeader {
+  padding: $spacing-xs $spacing-sm;
+  text-align: center;
+  background-color: $color-danger-main;
+}
+
+.headerActive {
+  background-color: $color-track-lane-number;
+}
+
+.headerCompleted {
+  background-color: $color-success-light;
+}
+
+.emptyMessage {
+  padding: $spacing-xl;
+  text-align: center;
+}
+

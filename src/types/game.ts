@@ -1,5 +1,5 @@
 import { Horse } from "./horse";
-import { Race, RaceStatus, RaceResult } from "./race";
+import { Race, RaceResult } from "./race";
 import { HorsePosition } from "./horse";
 
 /**
@@ -51,4 +51,3 @@ export interface GameStateData {
   /** Completed race results */
   results: RaceResult[];
 }
-

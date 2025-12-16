@@ -1,0 +1,33 @@
+@use '../../../styles/variables' as *;
+
+.panel {
+  min-width: 280px;
+  max-width: 320px;
+  height: 100%;
+
+  @media (max-width: 1024px) {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    max-height: 200px;
+  }
+}
+
+.colorSwatch {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #999;
+  border-radius: $border-radius-sm;
+  margin: 0 auto;
+}
+
+.loadingMessage {
+  padding: $spacing-xl;
+  text-align: center;
+}
+

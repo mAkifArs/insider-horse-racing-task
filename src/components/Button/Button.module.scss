@@ -1,0 +1,87 @@
+@use '../../styles/variables' as *;
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-xs;
+  font-weight: 700;
+  text-transform: uppercase;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+
+  // Base reset
+  padding: 0;
+  font-family: inherit;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Sizes
+.sm {
+  padding: $spacing-xs $spacing-sm;
+  font-size: $font-size-xs;
+}
+
+.md {
+  padding: $spacing-sm $spacing-lg;
+  font-size: $font-size-sm;
+}
+
+.lg {
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-size-md;
+}
+
+// Variants
+.primary {
+  background-color: $color-neutral-gray300;
+  border: 1px solid $color-neutral-gray500;
+  color: $color-text-primary;
+
+  &:hover:not(:disabled) {
+    background-color: $color-neutral-gray400;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $color-neutral-gray500;
+  }
+}
+
+.secondary {
+  background-color: $color-neutral-gray200;
+  border: 1px solid $color-neutral-gray400;
+  color: $color-text-primary;
+
+  &:hover:not(:disabled) {
+    background-color: $color-neutral-gray300;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $color-neutral-gray400;
+  }
+}
+
+.outline {
+  background-color: transparent;
+  border: 1px solid $color-neutral-gray500;
+  color: $color-text-primary;
+
+  &:hover:not(:disabled) {
+    background-color: $color-neutral-gray100;
+  }
+
+  &:active:not(:disabled) {
+    background-color: $color-neutral-gray200;
+  }
+}
+
+.fullWidth {
+  width: 100%;
+}
+

@@ -1,53 +1,6 @@
 import { memo } from "react";
-import styled from "styled-components";
+import styles from "./DataTable.module.scss";
 import { DataTableProps } from "./types";
-import { fontSize, fontWeight, colors, spacing } from "../../theme";
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  font-size: ${fontSize.sm};
-`;
-
-const TableHeader = styled.thead`
-  background-color: ${colors.neutral.gray100};
-  position: sticky;
-  top: 0;
-  z-index: 1;
-`;
-
-const TableRow = styled.tr`
-  &:nth-child(even) {
-    background-color: ${colors.neutral.gray50};
-  }
-
-  &:hover {
-    background-color: ${colors.neutral.gray200};
-  }
-`;
-
-const TableHeaderCell = styled.th<{ $align?: string; $width?: string }>`
-  padding: ${spacing.sm};
-  text-align: ${(props) => props.$align || "left"};
-  border-bottom: 1px solid ${colors.neutral.gray300};
-  font-weight: ${fontWeight.bold};
-  font-size: ${fontSize.xs};
-  color: ${colors.text.primary};
-  width: ${(props) => props.$width || "auto"};
-`;
-
-const TableCell = styled.td<{ $align?: string }>`
-  padding: 6px ${spacing.sm};
-  border-bottom: 1px solid ${colors.neutral.gray200};
-  vertical-align: middle;
-  text-align: ${(props) => props.$align || "left"};
-`;
-
-const RowNumberCell = styled(TableCell)`
-  text-align: center;
-  color: ${colors.text.secondary};
-  width: 40px;
-`;
 
 // Generic component with proper typing
 function DataTableInner<T>({
@@ -58,43 +11,55 @@ function DataTableInner<T>({
   startingRowNumber = 1,
 }: DataTableProps<T>) {
   return (
-    <Table>
-      <TableHeader>
+    <table className={styles.table}>
+      <thead className={styles.thead}>
         <tr>
           {showRowNumbers && (
-            <TableHeaderCell $align="center" $width="40px">
+            <th
+              className={`${styles.th} ${styles.center}`}
+              style={{ width: "40px" }}
+            >
               #
-            </TableHeaderCell>
+            </th>
           )}
           {columns.map((column) => (
-            <TableHeaderCell
+            <th
               key={column.key}
-              $align={column.align}
-              $width={column.width}
+              className={`${styles.th} ${
+                column.align ? styles[column.align] : styles.left
+              }`}
+              style={{ width: column.width || "auto" }}
             >
               {column.header}
-            </TableHeaderCell>
+            </th>
           ))}
         </tr>
-      </TableHeader>
+      </thead>
       <tbody>
         {data.map((row, index) => (
-          <TableRow key={keyExtractor(row, index)}>
+          <tr key={keyExtractor(row, index)} className={styles.tr}>
             {showRowNumbers && (
-              <RowNumberCell>{startingRowNumber + index}</RowNumberCell>
+              <td className={`${styles.td} ${styles.rowNumberCell}`}>
+                {startingRowNumber + index}
+              </td>
             )}
             {columns.map((column) => (
-              <TableCell key={column.key} $align={column.align}>
+              <td
+                key={column.key}
+                className={`${styles.td} ${
+                  column.align ? styles[column.align] : styles.left
+                }`}
+              >
                 {column.render
                   ? column.render(row, index)
                   : (row as Record<string, unknown>)[column.key]?.toString() ??
                     ""}
-              </TableCell>
+              </td>
             ))}
-          </TableRow>
+          </tr>
         ))}
       </tbody>
-    </Table>
+    </table>
   );
 }
 

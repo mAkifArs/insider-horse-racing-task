@@ -1,18 +1,8 @@
 import { Component, ErrorInfo, ReactNode } from "react";
-import styled from "styled-components";
+import styles from "./ErrorBoundary.module.scss";
 import Typography from "../Typography";
 import Button from "../Button";
 import { ErrorBoundaryProps, ErrorBoundaryState } from "./types";
-import { spacing } from "../../theme";
-
-const ErrorContainer = styled.div`
-  padding: ${spacing.xl};
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: ${spacing.md};
-`;
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -54,13 +44,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       }
 
       return (
-        <ErrorContainer>
+        <div className={styles.errorContainer}>
           <Typography variant="h2">Something went wrong</Typography>
           <Typography variant="body1" color="secondary">
             {this.state.error?.message || "An unexpected error occurred"}
           </Typography>
           <Button onClick={this.handleReset}>Try again</Button>
-        </ErrorContainer>
+        </div>
       );
     }
 

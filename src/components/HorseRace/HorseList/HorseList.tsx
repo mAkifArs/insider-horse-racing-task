@@ -1,43 +1,10 @@
 import React, { memo, useMemo } from "react";
-import styled from "styled-components";
+import styles from "./HorseList.module.scss";
 import { Horse } from "../../../types/horse";
 import Panel from "../../Panel";
 import DataTable, { Column } from "../../DataTable";
 import Typography from "../../Typography";
 import { HorseListProps } from "./types";
-import { spacing } from "../../../theme";
-
-const StyledPanel = styled(Panel)`
-  min-width: 280px;
-  max-width: 320px;
-  height: 100%;
-
-  @media (max-width: 1024px) {
-    min-width: unset;
-    max-width: unset;
-    width: 100%;
-    height: auto;
-    max-height: 300px;
-  }
-
-  @media (max-width: 768px) {
-    max-height: 200px;
-  }
-`;
-
-const ColorSwatch = styled.div<{ $color: string }>`
-  width: 20px;
-  height: 20px;
-  background-color: ${(props) => props.$color};
-  border: 1px solid #999;
-  border-radius: 2px;
-  margin: 0 auto;
-`;
-
-const LoadingMessage = styled.div`
-  padding: ${spacing.xl};
-  text-align: center;
-`;
 
 const HorseList: React.FC<HorseListProps> = memo(({ horses }) => {
   // Define columns with memoization to prevent unnecessary re-renders
@@ -58,7 +25,12 @@ const HorseList: React.FC<HorseListProps> = memo(({ horses }) => {
         key: "color",
         header: "Color",
         align: "center" as const,
-        render: (horse) => <ColorSwatch $color={horse.color} />,
+        render: (horse) => (
+          <div
+            className={styles.colorSwatch}
+            style={{ backgroundColor: horse.color }}
+          />
+        ),
       },
     ],
     []
@@ -67,24 +39,28 @@ const HorseList: React.FC<HorseListProps> = memo(({ horses }) => {
   // Show loading state when horses haven't been initialized
   if (horses.length === 0) {
     return (
-      <StyledPanel title="Horse List" variant="danger">
-        <LoadingMessage>
+      <Panel title="Horse List" variant="danger" className={styles.panel}>
+        <div className={styles.loadingMessage}>
           <Typography variant="body2" color="secondary">
             Loading horses...
           </Typography>
-        </LoadingMessage>
-      </StyledPanel>
+        </div>
+      </Panel>
     );
   }
 
   return (
-    <StyledPanel title={`Horse List (1-${horses.length})`} variant="danger">
+    <Panel
+      title={`Horse List (1-${horses.length})`}
+      variant="danger"
+      className={styles.panel}
+    >
       <DataTable
         columns={columns}
         data={horses}
         keyExtractor={(horse) => horse.id}
       />
-    </StyledPanel>
+    </Panel>
   );
 });
 

@@ -1,11 +1,10 @@
 import React, { memo, useMemo } from "react";
-import styled from "styled-components";
+import styles from "./Results.module.scss";
 import Panel from "../../Panel";
 import DataTable, { Column } from "../../DataTable";
 import Typography from "../../Typography";
 import { RaceResult, RaceResultEntry } from "../../../types";
 import { ResultsProps } from "./types";
-import { spacing, colors } from "../../../theme";
 import { formatRoundLabel } from "../../../utils/formatters";
 
 /**
@@ -16,39 +15,6 @@ interface ResultTableEntry {
   name: string;
   horseId: string;
 }
-
-const StyledPanel = styled(Panel)`
-  min-width: 240px;
-  max-width: 240px;
-  height: 100%;
-
-  @media (max-width: 1024px) {
-    min-width: unset;
-    max-width: unset;
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-  }
-`;
-
-const RoundSection = styled.div`
-  margin-bottom: ${spacing.sm};
-`;
-
-const RoundHeader = styled.div`
-  background-color: ${colors.success.light};
-  padding: ${spacing.xs} ${spacing.sm};
-  text-align: center;
-`;
-
-const ScrollContainer = styled.div`
-  overflow-y: auto;
-`;
-
-const EmptyMessage = styled.div`
-  padding: ${spacing.xl};
-  text-align: center;
-`;
 
 /**
  * Table columns for results
@@ -81,18 +47,18 @@ const RaceResultSection: React.FC<{
   }, [result.results]);
 
   return (
-    <RoundSection>
-      <RoundHeader>
+    <div className={styles.roundSection}>
+      <div className={styles.roundHeader}>
         <Typography variant="caption" bold>
           {formatRoundLabel(result.roundNumber, result.distance)}
         </Typography>
-      </RoundHeader>
+      </div>
       <DataTable
         columns={resultColumns}
         data={tableData}
         keyExtractor={(entry) => entry.horseId}
       />
-    </RoundSection>
+    </div>
   );
 });
 
@@ -105,24 +71,24 @@ RaceResultSection.displayName = "RaceResultSection";
 const Results: React.FC<ResultsProps> = memo(({ results }) => {
   if (results.length === 0) {
     return (
-      <StyledPanel title="Results" variant="primary">
-        <EmptyMessage>
+      <Panel title="Results" variant="primary" className={styles.panel}>
+        <div className={styles.emptyMessage}>
           <Typography variant="caption" color="secondary">
             No races completed yet
           </Typography>
-        </EmptyMessage>
-      </StyledPanel>
+        </div>
+      </Panel>
     );
   }
 
   return (
-    <StyledPanel title="Results" variant="primary">
-      <ScrollContainer>
+    <Panel title="Results" variant="primary" className={styles.panel}>
+      <div className={styles.scrollContainer}>
         {results.map((result) => (
           <RaceResultSection key={result.roundNumber} result={result} />
         ))}
-      </ScrollContainer>
-    </StyledPanel>
+      </div>
+    </Panel>
   );
 });
 

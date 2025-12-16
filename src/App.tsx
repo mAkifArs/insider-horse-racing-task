@@ -1,11 +1,9 @@
 import { useEffect, useCallback } from "react";
-import styled from "styled-components";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { HorseList, Program, RaceTrack, Results } from "./components/HorseRace";
 import AppBar from "./components/AppBar";
 import Button from "./components/Button";
 import { useIsMobile } from "./hooks/useIsMobile";
-import { colors, spacing, breakpoints } from "./theme";
 import {
   useGameStore,
   selectHorses,
@@ -20,91 +18,7 @@ import {
   selectIsPaused,
 } from "./store";
 import { GameState } from "./types";
-
-// ─────────────────────────────────────────────────────────────────────────────
-// STYLED COMPONENTS
-// ─────────────────────────────────────────────────────────────────────────────
-
-const AppContainer = styled.div`
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background-color: ${colors.background.app};
-  font-family: Arial, sans-serif;
-  overflow: hidden; /* Prevent page scrolling on desktop */
-
-  @media (max-width: ${breakpoints.tablet}) {
-    height: auto;
-    min-height: 100vh;
-    overflow: auto; /* Allow page scrolling on mobile/tablet */
-  }
-`;
-
-const MainContent = styled.main`
-  display: flex;
-  gap: ${spacing.lg};
-  padding: ${spacing.lg};
-  flex: 1;
-  min-height: 0; /* Important for flex children to respect height constraints */
-  overflow: hidden;
-
-  @media (max-width: ${breakpoints.tablet}) {
-    flex-direction: column;
-    overflow: visible;
-    padding: ${spacing.md};
-  }
-
-  @media (max-width: ${breakpoints.mobile}) {
-    gap: ${spacing.md};
-    padding: ${spacing.sm};
-  }
-`;
-
-const LeftPanel = styled.div`
-  flex-shrink: 0;
-  height: 100%;
-
-  @media (max-width: ${breakpoints.tablet}) {
-    height: auto;
-  }
-`;
-
-const CenterPanel = styled.div`
-  flex: 1;
-  height: 100%;
-  min-width: 0;
-
-  @media (max-width: ${breakpoints.tablet}) {
-    height: auto;
-    min-height: 300px;
-  }
-`;
-
-const RightPanel = styled.div`
-  display: flex;
-  gap: ${spacing.lg};
-  flex-shrink: 0;
-  height: 100%;
-
-  @media (max-width: ${breakpoints.tablet}) {
-    height: auto;
-    flex-direction: column;
-  }
-
-  @media (max-width: ${breakpoints.mobile}) {
-    gap: ${spacing.md};
-  }
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: ${spacing.sm};
-
-  @media (max-width: ${breakpoints.mobile}) {
-    width: 100%;
-    justify-content: center;
-  }
-`;
+import styles from "./App.module.scss";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // COMPONENT
@@ -163,7 +77,14 @@ function App() {
     } else if (isPaused) {
       resumeRacing();
     }
-  }, [canStartRace, isRacing, isPaused, startRacing, pauseRacing, resumeRacing]);
+  }, [
+    canStartRace,
+    isRacing,
+    isPaused,
+    startRacing,
+    pauseRacing,
+    resumeRacing,
+  ]);
 
   // Handle Reset Game button
   const handleResetGame = useCallback(() => {
@@ -192,11 +113,11 @@ function App() {
 
   return (
     <ErrorBoundary>
-      <AppContainer>
+      <div className={styles.appContainer}>
         <AppBar
           title="Horse Racing"
           actions={
-            <ButtonGroup>
+            <div className={styles.buttonGroup}>
               <Button
                 onClick={handleGenerateProgram}
                 disabled={!canGenerateSchedule}
@@ -218,30 +139,30 @@ function App() {
               >
                 {isMobile ? "RESET" : "RESET GAME"}
               </Button>
-            </ButtonGroup>
+            </div>
           }
         />
-        <MainContent>
-          <LeftPanel>
+        <main className={styles.mainContent}>
+          <div className={styles.leftPanel}>
             <HorseList horses={horses} />
-          </LeftPanel>
-          <CenterPanel>
+          </div>
+          <div className={styles.centerPanel}>
             <RaceTrack
               currentRace={currentRace}
               horses={horses}
               isAnimating={raceExecution.isAnimating}
             />
-          </CenterPanel>
-          <RightPanel>
+          </div>
+          <div className={styles.rightPanel}>
             <Program
               schedule={schedule}
               horses={horses}
               currentRoundIndex={currentRoundIndex}
             />
             <Results results={results} />
-          </RightPanel>
-        </MainContent>
-      </AppContainer>
+          </div>
+        </main>
+      </div>
     </ErrorBoundary>
   );
 }

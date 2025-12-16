@@ -1,42 +1,27 @@
 import React, { memo } from "react";
-import styled from "styled-components";
+import styles from "./Panel.module.scss";
 import Typography from "../Typography";
-import { PanelProps, PanelVariant, variantColors } from "./types";
-import { spacing } from "../../theme";
-
-const Container = styled.div<{ $variant: PanelVariant }>`
-  display: flex;
-  flex-direction: column;
-  border: 1px solid ${(props) => variantColors[props.$variant].border};
-  background-color: #fff;
-  height: 100%;
-  overflow: hidden;
-`;
-
-const Header = styled.div<{ $variant: PanelVariant }>`
-  background-color: ${(props) => variantColors[props.$variant].header};
-  padding: ${spacing.sm} ${spacing.md};
-  border-bottom: 1px solid ${(props) => variantColors[props.$variant].border};
-  flex-shrink: 0;
-`;
-
-const Content = styled.div`
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-`;
+import { PanelProps } from "./types";
 
 const Panel: React.FC<PanelProps> = memo(
   ({ title, variant = "danger", children, className }) => {
+    const containerClasses = [
+      styles.container,
+      styles[variant],
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     return (
-      <Container $variant={variant} className={className}>
-        <Header $variant={variant}>
+      <div className={containerClasses}>
+        <div className={styles.header}>
           <Typography variant="body2" bold>
             {title}
           </Typography>
-        </Header>
-        <Content>{children}</Content>
-      </Container>
+        </div>
+        <div className={styles.content}>{children}</div>
+      </div>
     );
   }
 );

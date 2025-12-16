@@ -1,0 +1,51 @@
+@use '../../styles/variables' as *;
+
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #fff;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid;
+}
+
+.header {
+  padding: $spacing-sm $spacing-md;
+  flex-shrink: 0;
+  border-bottom: 1px solid;
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+// Variants
+.danger {
+  border-color: #8b0000;
+  
+  .header {
+    background-color: #cd5c5c;
+    border-bottom-color: #8b0000;
+  }
+}
+
+.primary {
+  border-color: #2e75b6;
+
+  .header {
+    background-color: #5b9bd5;
+    border-bottom-color: #2e75b6;
+  }
+}
+
+.success {
+  border-color: #538135;
+
+  .header {
+    background-color: #70ad47;
+    border-bottom-color: #538135;
+  }
+}
+

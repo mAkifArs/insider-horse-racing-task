@@ -1,11 +1,10 @@
 import React, { memo, useMemo } from "react";
-import styled from "styled-components";
+import styles from "./Program.module.scss";
 import Panel from "../../Panel";
 import DataTable, { Column } from "../../DataTable";
 import Typography from "../../Typography";
 import { Horse, Race, RaceStatus } from "../../../types";
 import { ProgramProps } from "./types";
-import { spacing, colors } from "../../../theme";
 import { formatRoundLabel } from "../../../utils/formatters";
 
 /**
@@ -16,40 +15,6 @@ interface ProgramHorseEntry {
   name: string;
   horseId: string;
 }
-
-const StyledPanel = styled(Panel)`
-  min-width: 240px;
-  max-width: 240px;
-  height: 100%;
-
-  @media (max-width: 1024px) {
-    min-width: unset;
-    max-width: unset;
-    width: 100%;
-    height: auto;
-    max-height: 400px;
-  }
-`;
-
-const RoundSection = styled.div`
-  margin-bottom: ${spacing.sm};
-`;
-
-const RoundHeader = styled.div<{ $isActive: boolean; $isCompleted: boolean }>`
-  background-color: ${(props) =>
-    props.$isActive
-      ? colors.track.laneNumber
-      : props.$isCompleted
-      ? colors.success.light
-      : colors.danger.main};
-  padding: ${spacing.xs} ${spacing.sm};
-  text-align: center;
-`;
-
-const EmptyMessage = styled.div`
-  padding: ${spacing.xl};
-  text-align: center;
-`;
 
 /**
  * Get horses for a race by their IDs
@@ -102,18 +67,18 @@ const Program: React.FC<ProgramProps> = memo(
 
     if (!schedule || schedule.length === 0) {
       return (
-        <StyledPanel title="Program" variant="primary">
-          <EmptyMessage>
+        <Panel title="Program" variant="primary" className={styles.panel}>
+          <div className={styles.emptyMessage}>
             <Typography variant="caption" color="secondary">
               Click "GENERATE PROGRAM" to create race schedule
             </Typography>
-          </EmptyMessage>
-        </StyledPanel>
+          </div>
+        </Panel>
       );
     }
 
     return (
-      <StyledPanel title="Program" variant="primary">
+      <Panel title="Program" variant="primary" className={styles.panel}>
         {schedule.map((race, index) => {
           const isCompleted = race.status === RaceStatus.COMPLETED;
           const isRunning = race.status === RaceStatus.RUNNING;
@@ -123,23 +88,31 @@ const Program: React.FC<ProgramProps> = memo(
           const raceHorses = getHorsesForRace(race, horses);
           const statusLabel = getStatusLabel(isCompleted, isRunning, isNext);
 
+          const headerClasses = [
+            styles.roundHeader,
+            isActive ? styles.headerActive : "",
+            isCompleted ? styles.headerCompleted : "",
+          ]
+            .filter(Boolean)
+            .join(" ");
+
           return (
-            <RoundSection key={race.roundNumber}>
-              <RoundHeader $isActive={isActive} $isCompleted={isCompleted}>
+            <div key={race.roundNumber} className={styles.roundSection}>
+              <div className={headerClasses}>
                 <Typography variant="caption" bold>
                   {formatRoundLabel(race.roundNumber, race.distance)}{" "}
                   {statusLabel}
                 </Typography>
-              </RoundHeader>
+              </div>
               <DataTable
                 columns={columns}
                 data={raceHorses}
                 keyExtractor={(entry) => entry.horseId}
               />
-            </RoundSection>
+            </div>
           );
         })}
-      </StyledPanel>
+      </Panel>
     );
   }
 );
